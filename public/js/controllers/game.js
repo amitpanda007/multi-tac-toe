@@ -43,11 +43,13 @@ myApp.controller('gameController', function(
 
 	connection.$watch(function(event) {
 		if (event.key == $scope.fullname) {
-			$scope.incomingConnect = connection.$getRecord($scope.fullname).connectionFrom;
-			$scope.sendingConnect = connection.$getRecord($scope.fullname).connectingTo;
+			$scope.incomingConnect     = connection.$getRecord($scope.fullname).connectionFrom;
+			$scope.sendingConnect      = connection.$getRecord($scope.fullname).connectingTo;
 			$scope.multiplayerFirebase = connection.$getRecord($scope.fullname).currentlyPlaying;
-			$scope.playMode = connection.$getRecord($scope.fullname).playMode;
-			$scope.startingGame = connection.$getRecord($scope.fullname).connecting;
+			$scope.playMode            = connection.$getRecord($scope.fullname).playMode;
+			$scope.startingGame        = connection.$getRecord($scope.fullname).connecting;
+			$scope.swapReq             = connection.$getRecord($scope.fullname).swapRequest;
+			$scope.rejected            = connection.$getRecord($scope.fullname).rejectStatus;
 			if ($scope.incomingConnect != '' || $scope.sendingConnect != '') {
 				$scope.multiplayerRequest = true;
 			}else if ($scope.incomingConnect == '' && $scope.sendingConnect == ''){
@@ -307,7 +309,7 @@ myApp.controller('gameController', function(
 	}// boxClick Function
 
 	$scope.resetGame = function() {
-		$scope.countX = [];
+		/*$scope.countX = [];
 		$scope.countY = [];
 
 		$scope.one   = '';
@@ -323,29 +325,30 @@ myApp.controller('gameController', function(
 		$scope.xwin = false;
 		$scope.owin = false;
 		$scope.draw = false;
+		$scope.timer = 0;
+		$scope.playerTurn = ''; 
 		$scope.gameFinish = false;
-		$scope.swapReq = false;
-		$scope.multiplayerBegin = true;
+		$scope.multiplayerBegin = true;*/
 
 		multiplayerRef.child($scope.multiplayerFirebase)
 		.set(
-			{one    : '',
-			 two    : '',
-			 three  : '',
-			 four   : '',
-			 five   : '',
-			 six    : '',
-			 seven  : '',
-			 eight  : '',
-			 nine   : '',
+			{one : '',
+			 two : '',
+			 three : '',
+			 four : '',
+			 five : '',
+			 six : '',
+			 seven : '',
+			 eight : '',
+			 nine : '',
 			 countX : '',
 			 countY : '',
 			 Winner : '',
 			 turnTime : 0,
 			 turn : '',
-			 Xwin   : false,
-			 Owin   : false,
-			 Draw   : false,
+			 Xwin : false,
+			 Owin : false,
+			 Draw : false,
 			 GameFinish : false,
 			 multiplayerBegin : true});
 
@@ -541,18 +544,21 @@ myApp.controller('gameController', function(
 			}
 		}else if ($scope.countY === 5 && $scope.countX === 4 && $scope.gameFinish == false &&
 			$scope.xwin == false && $scope.owin == false) {
-			$scope.oneWinner   = 'tie';
-			$scope.twoWinner   = 'tie';
-			$scope.threeWinner = 'tie';
-			$scope.fourWinner  = 'tie';
-			$scope.fiveWinner  = 'tie';
-			$scope.sixWinner   = 'tie';
-			$scope.sevenWinner = 'tie';
-			$scope.eightWinner = 'tie';
-			$scope.nineWinner  = 'tie';
 
 			multiGameLayout.child('Draw').set(true);
 			multiGameLayout.child('GameFinish').set(true);
+			if(true) {
+				$scope.oneWinner   = 'tie';
+				$scope.twoWinner   = 'tie';
+				$scope.threeWinner = 'tie';
+				$scope.fourWinner  = 'tie';
+				$scope.fiveWinner  = 'tie';
+				$scope.sixWinner   = 'tie';
+				$scope.sevenWinner = 'tie';
+				$scope.eightWinner = 'tie';
+				$scope.nineWinner  = 'tie';
+			}
+
 		}
 	}
 
@@ -562,29 +568,29 @@ myApp.controller('gameController', function(
 		if($scope.fullname != 'undefined undefined'){
 			incomingRef.child($scope.fullname).set(
 				{connectingTo : '',connectionFrom : '',currentlyPlaying : ''});
-			userRef.child($scope.fullname).set({status : 'online'});
+			userRef.child($scope.fullname).set({status : 'online', name : $scope.fullname});
 			$scope.tictactoe = true;
 			$scope.multiplayerBegin = false;
 		}
 	}//Opens Game-Page after selections
 
 	$scope.allGame = function() {
-		userRef.child($scope.fullname).set({status : 'offline'});
+		userRef.child($scope.fullname).set({status : 'offline', name : $scope.fullname});
 		incomingRef.child($scope.fullname).set(
 			{connectingTo : '',connectionFrom : '',currentlyPlaying : ''});
 		incomingRef.child($scope.incomingConnect).set(
 			{connectionFrom : '',connectingTo : '',currentlyPlaying : ''});
 		$scope.tictactoe = false;
-		$scope.gameFinish == false;
+		$scope.gameFinish = false;
 	}// Takes user to All Games Page 
 
 	$scope.startMultiplayer = function(targetUser) {
-		userRef.child($scope.fullname).set({status : 'busy'});
+		userRef.child($scope.fullname).set({status : 'busy', name : $scope.fullname});
 
 		incomingRef.child($scope.fullname).set(
-			{connectingTo : targetUser,connectionFrom : '',currentlyPlaying : ''});
+			{connectingTo : targetUser,connectionFrom : '',currentlyPlaying : '',rejectStatus : false});
 		incomingRef.child(targetUser).set(
-			{connectionFrom : $scope.fullname,connectingTo : '',currentlyPlaying : ''});
+			{connectionFrom : $scope.fullname,connectingTo : '',currentlyPlaying : '',rejectStatus : false});
 
 		$scope.userConnectingTo = targetUser;
 	}
@@ -614,24 +620,29 @@ myApp.controller('gameController', function(
 			 GameFinish : false,
 			 multiplayerBegin : false});
 
-		userRef.child($scope.fullname).set({status : 'busy'});
+		userRef.child($scope.fullname).set({status : 'busy',name : $scope.fullname});
 
 		incomingRef.child($scope.fullname).set(
 			{connectingTo : '',connectionFrom : $scope.incomingConnect,
-			currentlyPlaying : $scope.multiplayerFirebase,swapRequest : false});
+			currentlyPlaying : $scope.multiplayerFirebase,swapRequest : false,rejectStatus : false});
 		incomingRef.child($scope.incomingConnect).set(
 			{connectionFrom : '',connectingTo : $scope.fullname,
-			connecting : true,currentlyPlaying : $scope.multiplayerFirebase,swapRequest : false});
+			connecting : true,currentlyPlaying : $scope.multiplayerFirebase,swapRequest : false,rejectStatus : false});
 	}
 
 	$scope.rejectGameRequest = function() {
+		var rejectX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+												+ $scope.incomingConnect + '/');
 		$scope.multiplayerRequest = false;
-		incomingRef.child($scope.fullname).set(
-			{connectingTo : '',connectionFrom : '',currentlyPlaying : ''});
-		incomingRef.child($scope.incomingConnect).set(
-			{connectingTo : '',connectionFrom : '',currentlyPlaying : ''});
+		rejectX.child('rejectStatus').set(true);
 
-		userRef.child($scope.incomingConnect).set({status : 'online'});
+		$timeout(function() {
+			incomingRef.child($scope.fullname).set(
+				{connectingTo : '',connectionFrom : '',currentlyPlaying : '',rejectStatus : false});
+			incomingRef.child($scope.incomingConnect).set(
+				{connectingTo : '',connectionFrom : '',currentlyPlaying : '',rejectStatus : false});
+			userRef.child($scope.incomingConnect).set({status : 'online', name : $scope.incomingConnect});
+		},2000);		
 	}
 
 	$scope.getWinnerName = function(xwin,owin) {
@@ -675,26 +686,69 @@ myApp.controller('gameController', function(
 	}
 
 	$scope.swapRequest = function() {
-		var incomingRefX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
-												+ $scope.fullname + '/');
-		var incomingRefO = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
-												+ $scope.incomingConnect + '/');
-		if($scope.playMode == 'O') {
-			incomingRefX.child('swapRequest').set(true);
+		if($scope.incomingConnect) {
+			var swapX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+													+ $scope.incomingConnect + '/');
+			var swapO = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+													+ $scope.fullname + '/');
+			swapX.child('swapRequest').set(true);
+			swapO.child('swapRequest').set(true);	
+		}else if($scope.sendingConnect) {
+			var swapX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+													+ $scope.sendingConnect + '/');
+			var swapO = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+													+ $scope.fullname + '/');
+			swapX.child('swapRequest').set(true);
+			swapO.child('swapRequest').set(true);
 		}
-		
 	}
 
 	$scope.swapConfirm = function(confirmToken) {
 		if(confirmToken) {
-			var incomingRefX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
-													+ $scope.fullname + '/');
-			var incomingRefO = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+			if($scope.incomingConnect) {
+				var swapX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
 													+ $scope.incomingConnect + '/');
-			incomingRefX.child('playMode').set('O');
-			incomingRefO.child('playMode').set('X');
+				var swapO = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+													+ $scope.fullname + '/');
+				swapX.child('playMode').set('X');
+				swapO.child('playMode').set('O');
+				swapX.child('swapRequest').set(false);
+				swapO.child('swapRequest').set(false);
+			}else if($scope.sendingConnect) {
+				var swapX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+													+ $scope.sendingConnect + '/');
+				var swapO = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+													+ $scope.fullname + '/');
+				swapX.child('playMode').set('X');
+				swapO.child('playMode').set('O');
+				swapX.child('swapRequest').set(false);
+				swapO.child('swapRequest').set(false);
+			}
 		}else {
-			incomingRefX.child('swapRequest').set(true);
+			if($scope.incomingConnect) {
+					var swapX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+														+ $scope.incomingConnect + '/');
+					var swapO = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+														+ $scope.fullname + '/');
+
+					swapX.child('rejectStatus').set(true);
+					swapO.child('swapRequest').set(false);
+					$timeout(function() {
+						swapX.child('rejectStatus').set(false);
+						swapX.child('swapRequest').set(false);
+					},2000);
+			}else if($scope.sendingConnect) {
+					var swapX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+														+ $scope.sendingConnect + '/');
+					var swapO = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
+														+ $scope.fullname + '/');
+					swapX.child('rejectStatus').set(true);
+					swapO.child('swapRequest').set(false);
+					$timeout(function() {
+						swapX.child('rejectStatus').set(false);
+						swapX.child('swapRequest').set(false);
+					},2000);
+			}
 		}
 
 	}

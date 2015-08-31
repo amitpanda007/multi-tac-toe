@@ -1,17 +1,21 @@
 <div ng-hide="tictactoe">
 	<h1>Choose Your Game</h1>
-	<h2 ng-click="gameSelect()"><span>1. </span>Tic-Tac-Toe</h2>
+	<h2 ng-click="gameSelect()">Tic-Tac-Toe</h2>
 </div>
 
 <div ng-show="tictactoe">
-	<h2>Tic Tac Toe</h2></br>
+	<h2 style="color : #1E9382;font-size: 2em">Tic Tac Toe</h2></br>
 
 	<div ng-hide="multiplayerBegin">
 		<div ng-hide="playerElementSelected || startingGame" class="online">
 			<h3>Players Online</h3>
-			<div ng-repeat="user in users">
-				<p ng-if="user.status == 'online' && user.$id != fullname">
-				<a ng-click="startMultiplayer(user.$id)" href="">{{user.$id}}</a></p>
+			<div class="inputwrapper small">
+				<input type="search" name="onlinePlayer" placeholder="Search Your Opponent"
+				ng-model="search" ng-required="false"/>		 
+				<div ng-repeat="user in users | filter:search ">
+					<p ng-if="user.status == 'online' && user.name != fullname">
+					<a ng-click="startMultiplayer(user.name)" href="">{{ user.name }}</a></p>
+				</div>
 			</div>
 		</div>
 		<div class="game">
@@ -20,9 +24,11 @@
 					<p ng-hide="multiplayerRequest">Awaiting User Connection...</p>
 					<div ng-show="multiplayerRequest">
 						<div ng-show="sendingConnect">
-							<p ng-hide="startingGame">Sending Play Request To </br><span>{{ sendingConnect }}</span></p>
+							<p ng-if="!rejected" ng-hide="startingGame">Sending Play Request To </br>
+							<span>{{ sendingConnect }}</span></p>
+							<p ng-show="rejected"><span class="icon ion-sad-outline"></span> Request Rejected</p>
 							<p ng-show="startingGame">Starting Game..
-							<span>{{ sendingConnect }}</span> is choosing</p>
+							<span>{{ sendingConnect }}</span> is choosing from<span>X </span>/<span>O</span></p>
 						</div>
 						<div ng-hide="sendingConnect">
 							<p>Incoming Play Request From <span>{{ incomingConnect }}</span></p>
@@ -76,11 +82,19 @@
 			
 		<div ng-show="swapReq" class="game">
 			<div class="incoming">
-				<p>Incoming Request From <span>{{ incomingConnect }}</span> To Get <span>X</span></p>
-				<button class="btn tooltip icon ion-thumbsup"
-					ng-click="swapConfirm(true)"><span>Accept</span></button>
-				<button class="btn tooltip icon ion-thumbsdown"
-					ng-click="rejectGameRequest(false)"><span>Reject</span></button>
+				<div ng-if="playMode == 'O'">
+					<p ng-hide="rejected">Sending Request To <span>{{ incomingConnect || sendingConnect }}
+					</span>to SWAP <span>O</span> with <span>X</span></p>
+					<p ng-show="rejected"><span class="icon ion-sad-outline"></span> Request Rejected</p>
+				</div>
+				<div ng-if="playMode == 'X'">
+					<p>Incoming Request From <span>{{ incomingConnect || sendingConnect }}
+					</span>to SWAP <span>X</span> with <span>O</span></p>
+					<button class="btn tooltip icon ion-thumbsup"
+						ng-click="swapConfirm(true)"><span>Accept</span></button>
+					<button class="btn tooltip icon ion-thumbsdown"
+						ng-click="swapConfirm(false)"><span>Reject</span></button>
+				</div>
 			</div>
 		</div>
 

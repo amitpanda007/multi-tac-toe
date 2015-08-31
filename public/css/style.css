@@ -636,7 +636,7 @@ nav ul li a:hover {
 .game {
   height: 306px;
   width: 306px;
-  margin-left: 27%;
+  margin-left: 15%;
   margin-top: 2%;
 }
 
@@ -732,13 +732,18 @@ a.tie {
 
 .incoming span {
   margin-left: 5px;
-  color: #FFFF00;
+  color: #EFC94C;
 }
 
 .online {
   float: right;
   margin-right: 5%;
   margin-top: 3%;
+}
+
+.online h3 {
+  font-size: 1.5em;
+  color: #3F51B5;
 }
 
 .online p {
@@ -749,6 +754,13 @@ a.tie {
   text-decoration: none;
 }
 
+.online a:hover {
+  color: #A2CFA5;
+}
+
+.online a:active {
+  color: #1E9382;
+}
 .multi-display {
   margin-left: 5%;
   color: #FFEB3B;
@@ -772,4 +784,8 @@ a.tie {
 .turn-display span{
   color: #FF3D00;
   font-size : 1.5em;
+}
+
+.small {
+  max-width: 200px;
 }
