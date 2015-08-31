@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html ng-app="myApp">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<!-- AngularJS -->
+<script src="js/angular/angular.min.js"></script>
+<script src="js/angular/angular-animate.min.js"></script>
+<script src="js/angular/angular-route.min.js"></script>
+<script src="js/angular/angular-sanitize.min.js"></script>
+
+<!-- Firebase -->
+<script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+
+<!-- AngularFire -->
+<script src="https://cdn.firebase.com/libs/angularfire/1.1.2/angularfire.min.js"></script>
+
+<!-- My Script -->
+<script src="js/app.js"></script>
+<script src="js/services/authentication.js"></script>
+<script src="js/controllers/registration.js"></script>
+<script src="js/controllers/todos.js"></script>
+<script src="js/controllers/status.js"></script>
+<script src="js/controllers/game.js"></script>
+<script src="js/directives/confirm.js"></script>
+
+<!-- My Style Sheet -->
+<link href="css/style.css" rel="stylesheet">
+<link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
+    
+</head>
+<body>
+
+<div>
+    <header>
+        <nav ng-include="'views/nav.html'"></nav>
+    </header>
+</div>
+
+<div class="userinfo"
+	ng-show="currentUser" ng-controller="statusController">
+	<span class="userinfo">Hi {{ currentUser.firstname }} {{ currentUser.lastname }}</span>
+	<a href="" ng-click="logout()">logout</a>
+</div>
+
+<main ng-view></main>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+<section class="meetings">
+	<h1>Add Todo Task</h1>
+	<form class="formgroup addmeeting cf"
+		name="myform"
+		ng-submit="addTodo()" novalidate>
+		
+		<div class="inputwrapper">
+			<input type="text" name="todo" placeholder="Enter New Task" 
+			 	ng-model="todoTask" ng-required="true"/>
+		</div>
+		<button type="submit" class="btn tooltip"
+			 ng-disabled="myform.$invalid"><span>create new task</span>+</button>
+	</form>
+
+	<h2>Your Tasks</h2>
+	<div class="meeting" ng-repeat="(key,todo) in todos">
+		<p>{{todo.task}} <button class="btn tooltip icon ion-trash-b" 
+		ng-click="taskDelete(key)" confirmation-needed="Delete the Task ?">
+		<span>delete the task</span></button></p>
+	</div>
+
+</section>

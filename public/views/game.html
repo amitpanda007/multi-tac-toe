@@ -1,0 +1,98 @@
+<div ng-hide="tictactoe">
+	<h1>Choose Your Game</h1>
+	<h2 ng-click="gameSelect()"><span>1. </span>Tic-Tac-Toe</h2>
+</div>
+
+<div ng-show="tictactoe">
+	<h2>Tic Tac Toe</h2></br>
+
+	<div ng-hide="multiplayerBegin">
+		<div ng-hide="playerElementSelected || startingGame" class="online">
+			<h3>Players Online</h3>
+			<div ng-repeat="user in users">
+				<p ng-if="user.status == 'online' && user.$id != fullname">
+				<a ng-click="startMultiplayer(user.$id)" href="">{{user.$id}}</a></p>
+			</div>
+		</div>
+		<div class="game">
+			<div class="incoming" >
+				<div ng-hide="playerElementSelected">
+					<p ng-hide="multiplayerRequest">Awaiting User Connection...</p>
+					<div ng-show="multiplayerRequest">
+						<div ng-show="sendingConnect">
+							<p ng-hide="startingGame">Sending Play Request To </br><span>{{ sendingConnect }}</span></p>
+							<p ng-show="startingGame">Starting Game..
+							<span>{{ sendingConnect }}</span> is choosing</p>
+						</div>
+						<div ng-hide="sendingConnect">
+							<p>Incoming Play Request From <span>{{ incomingConnect }}</span></p>
+							<button class="btn tooltip icon ion-thumbsup"
+								ng-click="acceptGameRequest()"><span>Accept</span></button>
+							<button class="btn tooltip icon ion-thumbsdown"
+								ng-click="rejectGameRequest()"><span>Reject</span></button>
+						</div>
+					</div>
+				</div>
+				<div ng-show="playerElementSelected">
+					<p>Choose What You Want to Be ?</p>
+					<button class="btn tooltip icon ion-android-close" 
+					ng-click="playerChoice('X')"></button>
+					<button class="btn tooltip icon ion-android-radio-button-off" 
+					ng-click="playerChoice('O')"></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div ng-show="multiplayerBegin">
+		<div class="multi-display">
+			<h3>{{ multiplayerFirebase }}</h3>
+			<p>You are playing with -- {{ playMode }} --</p>
+		</div>
+		<div ng-if="timer > 0" class="turn-display">
+			<p>{{ playerTurn }}'s Turn Ends in <span>{{ timer }} Sec</span></p>
+		</div>
+		<div ng-hide="swapReq" class="game">
+			<div class="inner">
+			<a ng-model="one" href="" ng-click="boxClick(1)" ng-class="oneWinner">{{ one }}</a></div>
+			<div class="inner">
+			<a ng-model="two" href="" ng-click="boxClick(2)" ng-class="twoWinner">{{ two }}</a></div>
+			<div class="inner">
+			<a ng-model="three" href="" ng-click="boxClick(3)" ng-class="threeWinner">{{ three }}</a></div>
+			<div class="inner">
+			<a ng-model="four" href="" ng-click="boxClick(4)" ng-class="fourWinner">{{ four }}</a></div>
+			<div class="inner">
+			<a ng-model="five" href="" ng-click="boxClick(5)" ng-class="fiveWinner">{{ five }}</a></div>
+			<div class="inner">
+			<a ng-model="six" href="" ng-click="boxClick(6)" ng-class="sixWinner">{{ six }}</a></div>
+			<div class="inner">
+			<a ng-model="seven" href="" ng-click="boxClick(7)" ng-class="sevenWinner">{{ seven }}</a></div>
+			<div class="inner">
+			<a ng-model="eight" href="" ng-click="boxClick(8)" ng-class="eightWinner">{{ eight }}</a></div>
+			<div class="inner">
+			<a ng-model="nine" href="" ng-click="boxClick(9)" ng-class="nineWinner">{{ nine }}</a></div>
+		</div>
+			
+		<div ng-show="swapReq" class="game">
+			<div class="incoming">
+				<p>Incoming Request From <span>{{ incomingConnect }}</span> To Get <span>X</span></p>
+				<button class="btn tooltip icon ion-thumbsup"
+					ng-click="swapConfirm(true)"><span>Accept</span></button>
+				<button class="btn tooltip icon ion-thumbsdown"
+					ng-click="rejectGameRequest(false)"><span>Reject</span></button>
+			</div>
+		</div>
+
+			<h3 ng-show="xwin || owin">{{ winner }} - Won the game</h3>
+			<h3 ng-show="draw">Damn !!! its a DRAW...</h3>
+			<button class="btn tooltip icon ion-android-arrow-back" 
+			ng-click="allGame()"><span>all games</span></button>
+			<button class="btn tooltip icon ion-arrow-swap" 
+			ng-click="swapRequest()" ng-if="playMode == 'O'"><span>Request-Swap X</span></button>
+			<button class="btn tooltip icon ion-android-refresh" 
+			ng-click="resetGame()"><span>reset game</span></button>
+		</div>
+
+	</div>
+</div>

@@ -1,0 +1,23 @@
+<section ng-hide="currentUser" class="login">
+	<form name="loginForm" ng-submit="login()" novalidate>
+		<h1>Hi There</h1>
+		<p>Login here to access your account</p>
+
+		<p class="error validationerror" ng-show="loginError">{{ loginError }}</p>
+		<input type="email" name="email" placeholder="Email" 
+			ng-model="user.email" ng-required="true"/>
+
+		<p class="error validationerror" ng-show="loginForm.email.$invalid 
+		&& loginForm.email.$touched">Must be a valid email</p>
+
+		<input type="password" name="password" placeholder="Password" 
+			ng-model="user.password" ng-required="true"/>
+
+		<p class="error validationerror" ng-show="loginForm.password.$invalid 
+		&& loginForm.password.$touched">Password is required</p>
+
+		<button type="submit" class="btn" ng-disabled="loginForm.$invalid">login</button>
+		<p>or <a href="#/register">register</a></p>
+
+	</form>
+</section>

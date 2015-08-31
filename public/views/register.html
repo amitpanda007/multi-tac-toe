@@ -1,0 +1,32 @@
+<section class="register">
+	<form name="registerForm" ng-submit="register()" novalidate>
+	<h1>Register</h1>
+	<p>To access site features</p>
+	
+		<p class="error validationerror" ng-show="registerError">{{ registerError }}</p>
+		<input type="firstname" name="firstname" placeholder="First Name" 
+			ng-model="user.firstname" ng-required="true"/>
+		<p class="error validationerror" ng-show="registerForm.firstname.$invalid && 
+			registerForm.firstname.$touched">Must type your First Name</p>
+
+		<input type="lastname" name="lastname" placeholder="Last Name" 
+			ng-model="user.lastname" ng-required="true"/>
+		<p class="error validationerror" ng-show="registerForm.lastname.$invalid && 
+			registerForm.lastname.$touched">Must type your Last Name</p>
+
+		<input type="email" name="email" placeholder="Email" 
+			ng-model="user.email" ng-required="true"/>
+		<p class="error validationerror" ng-show="registerForm.email.$invalid && 
+			registerForm.email.$touched">Must be a valid email</p>
+
+		<input type="password" name="password" placeholder="Password" 
+			ng-model="user.password" ng-required="true" ng-minlength="10"/>
+		<p class="error validationerror" ng-show="registerForm.password.$invalid && 
+			registerForm.password.$touched">Password is required & should be 10 chars long</p>
+
+		<button type="submit" class="btn" ng-disabled="registerForm.$invalid">register</button>
+		<p>or <a href="#/login">login</a></p>
+		
+	</form>
+	
+</section>
