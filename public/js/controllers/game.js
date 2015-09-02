@@ -24,9 +24,6 @@ myApp.controller('gameController', function(
 	
 	var userRef = new Firebase(FIREBASE_URL + 'games/onlinegame/');
 	var users = $firebaseArray(userRef);
-	users.$loaded().then(function(data) {
-		$scope.users = data;
-	});
 	
 	$scope.countX = [];
 	$scope.countY = [];
@@ -41,6 +38,26 @@ myApp.controller('gameController', function(
 		}
 	});
 
+	//Firebase Watcher for player status (online,offline,busy) changes 
+	users.$watch(function(event) {
+		users.$loaded().then(function(data) {
+			$scope.users = data;
+			$scope.playerOnlineCount($scope.users); // Function call to online player count 
+		});
+	});
+
+	//online player count function
+	$scope.playerOnlineCount = function(users) {
+		var usersLength = users.length;
+		angular.forEach(users, function(value,key) {
+			if(users.status == 'busy' || users.status == 'offline') {
+				usersLength--;
+			}
+		});
+		$scope.playersOnline = usersLength-8;
+	}
+	
+	//Firebase Watcher for player information changes 
 	connection.$watch(function(event) {
 		if (event.key == $scope.fullname) {
 			$scope.incomingConnect     = connection.$getRecord($scope.fullname).connectionFrom;
@@ -63,6 +80,7 @@ myApp.controller('gameController', function(
 		}
 	});
 
+	//Firebase Watcher for multiplayer session changes 
 	multiplayer.$watch(function(event) {	
 		var multiGameLayout = new Firebase(FIREBASE_URL + 'games/multiplayersessions/'
 										+ $scope.multiplayerFirebase + '/');
@@ -82,6 +100,7 @@ myApp.controller('gameController', function(
 			$scope.countY = multiGameArrY.length;
 		});		
 
+		//This binds to the multiplayer session and keeps a local copy
 		if (multiGameObj.$id == $scope.multiplayerFirebase) {
 			multiGameObj.$bindTo($scope, "pleyerMovement").then(function() {
 				$scope.one    = $scope.pleyerMovement.one;
@@ -107,7 +126,8 @@ myApp.controller('gameController', function(
 			});
 		}//Getting Record From Firebase		
 	});
-
+	
+	//Player choice function to let player choose between X & O and saves the information to Firebase
 	$scope.playerChoice = function(choice) {
 		var multiGameLayout = new Firebase(FIREBASE_URL + 'games/multiplayersessions/'
 										+ $scope.multiplayerFirebase + '/');
@@ -130,6 +150,8 @@ myApp.controller('gameController', function(
 			}
 		}
 
+	//This function decides the tic tac toe core functions & decides the player movement 
+	//and pushes those changes to firebase as wellaskeepinga local copy of data
 	$scope.boxClick = function(boxnumber) {
 		var multiGameLayout = new Firebase(FIREBASE_URL + 'games/multiplayersessions/'
 										+ $scope.multiplayerFirebase + '/');
@@ -308,28 +330,8 @@ myApp.controller('gameController', function(
 		}
 	}// boxClick Function
 
+	//Resets multiplayer game session
 	$scope.resetGame = function() {
-		/*$scope.countX = [];
-		$scope.countY = [];
-
-		$scope.one   = '';
-		$scope.two   = '';
-		$scope.three = '';
-		$scope.four  = '';
-		$scope.five  = '';
-		$scope.six   = '';
-		$scope.seven = '';
-		$scope.eight = '';
-		$scope.nine  = '';
-		$scope.winner = '';
-		$scope.xwin = false;
-		$scope.owin = false;
-		$scope.draw = false;
-		$scope.timer = 0;
-		$scope.playerTurn = ''; 
-		$scope.gameFinish = false;
-		$scope.multiplayerBegin = true;*/
-
 		multiplayerRef.child($scope.multiplayerFirebase)
 		.set(
 			{one : '',
@@ -354,6 +356,7 @@ myApp.controller('gameController', function(
 
 	}// resetGame Function
 
+	//game winning decider function . pushes down the winner data to firebase
 	$scope.win = function() {
 		var multiGameLayout = new Firebase(FIREBASE_URL + 'games/multiplayersessions/'
 										+ $scope.multiplayerFirebase + '/');
@@ -562,6 +565,7 @@ myApp.controller('gameController', function(
 		}
 	}
 
+	//Game select function. let user select from multiple available games
 	$scope.gameSelect = function() {
 		$scope.fullname = $rootScope.currentUser.firstname + " " +
 					  $rootScope.currentUser.lastname;
@@ -574,6 +578,7 @@ myApp.controller('gameController', function(
 		}
 	}//Opens Game-Page after selections
 
+	//let user go backto the list of games available
 	$scope.allGame = function() {
 		userRef.child($scope.fullname).set({status : 'offline', name : $scope.fullname});
 		incomingRef.child($scope.fullname).set(
@@ -584,6 +589,7 @@ myApp.controller('gameController', function(
 		$scope.gameFinish = false;
 	}// Takes user to All Games Page 
 
+	//creates a multiplayer session in FIrebase
 	$scope.startMultiplayer = function(targetUser) {
 		userRef.child($scope.fullname).set({status : 'busy', name : $scope.fullname});
 
@@ -595,6 +601,7 @@ myApp.controller('gameController', function(
 		$scope.userConnectingTo = targetUser;
 	}
 
+	//this let user accept an incoming game request and creates a multiplayer game session
 	$scope.acceptGameRequest = function() {
 		$scope.playerElementSelected = true;
 		$scope.multiplayerFirebase = $scope.fullname + ' vs ' + $scope.incomingConnect;
@@ -630,6 +637,7 @@ myApp.controller('gameController', function(
 			connecting : true,currentlyPlaying : $scope.multiplayerFirebase,swapRequest : false,rejectStatus : false});
 	}
 
+	//rejects an incomingplayer request formultiplayer game
 	$scope.rejectGameRequest = function() {
 		var rejectX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
 												+ $scope.incomingConnect + '/');
@@ -645,6 +653,7 @@ myApp.controller('gameController', function(
 		},2000);		
 	}
 
+	//gets winner name and setsit to firebase
 	$scope.getWinnerName = function(xwin,owin) {
 		var multiGameLayout = new Firebase(FIREBASE_URL + 'games/multiplayersessions/'
 										+ $scope.multiplayerFirebase + '/');
@@ -660,12 +669,14 @@ myApp.controller('gameController', function(
 		}
 	}
 
+	//sets the users name who has the current turn into firebase
 	$scope.turnUser = function() {
 		var multiGameLayout = new Firebase(FIREBASE_URL + 'games/multiplayersessions/'
 										+ $scope.multiplayerFirebase + '/');
 		multiGameLayout.child('turn').set($scope.incomingConnect || $scope.sendingConnect);
 	}
 
+	//counts turn time from 10 secs to 0 and saves the data into firebase 
 	$scope.turnTimer = function(resetTurnTime) {
 		var multiGameLayout = new Firebase(FIREBASE_URL + 'games/multiplayersessions/'
 											+ $scope.multiplayerFirebase + '/');
@@ -685,6 +696,7 @@ myApp.controller('gameController', function(
 		}
 	}
 
+	//let user with O to swap X with his opponent
 	$scope.swapRequest = function() {
 		if($scope.incomingConnect) {
 			var swapX = new Firebase(FIREBASE_URL + 'games/incomingconnection/'
@@ -703,6 +715,7 @@ myApp.controller('gameController', function(
 		}
 	}
 
+	//function handles opponent's confirm or deny of swap request
 	$scope.swapConfirm = function(confirmToken) {
 		if(confirmToken) {
 			if($scope.incomingConnect) {

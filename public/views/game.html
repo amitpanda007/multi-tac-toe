@@ -12,10 +12,11 @@
 			<div class="inputwrapper small">
 				<input type="search" name="onlinePlayer" placeholder="Search Your Opponent"
 				ng-model="search" ng-required="false"/>		 
-				<div ng-repeat="user in users | filter:search ">
+				<div ng-repeat="user in users | filter:search | limitTo:7 ">
 					<p ng-if="user.status == 'online' && user.name != fullname">
 					<a ng-click="startMultiplayer(user.name)" href="">{{ user.name }}</a></p>
 				</div>
+				<span ng-if="playersOnline > 0">+{{ playersOnline }} more</span>
 			</div>
 		</div>
 		<div class="game">
@@ -101,11 +102,11 @@
 			<h3 ng-show="xwin || owin">{{ winner }} - Won the game</h3>
 			<h3 ng-show="draw">Damn !!! its a DRAW...</h3>
 			<button class="btn tooltip icon ion-android-arrow-back" 
-			ng-click="allGame()"><span>all games</span></button>
+				ng-click="allGame()"><span>all games</span></button>
 			<button class="btn tooltip icon ion-arrow-swap" 
-			ng-click="swapRequest()" ng-if="playMode == 'O'"><span>Request-Swap X</span></button>
+				ng-click="swapRequest()" ng-if="playMode == 'O'"><span>Request-Swap X</span></button>
 			<button class="btn tooltip icon ion-android-refresh" 
-			ng-click="resetGame()"><span>reset game</span></button>
+				ng-if="gameFinish == true" ng-click="resetGame()"><span>reset game</span></button>
 		</div>
 
 	</div>

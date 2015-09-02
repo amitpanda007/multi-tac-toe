@@ -788,4 +788,10 @@ a.tie {
 
 .small {
   max-width: 200px;
+  overflow: hidden;
+}
+
+.small span{
+  color: #1E9382;
+  font-size: .7em;
 }
